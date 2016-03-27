@@ -1,0 +1,6 @@
+*/prog
+*/test
+*/output/*
+!/output/.placeholder
+*/*.swp*
+*/src/functions.cpp
