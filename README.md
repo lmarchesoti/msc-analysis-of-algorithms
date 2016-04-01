@@ -10,6 +10,6 @@
 
 ## closest-pair-of-points
 
-*brute-force(todo)*
+*brute-force*
 
 *divide and conquer(todo)*
