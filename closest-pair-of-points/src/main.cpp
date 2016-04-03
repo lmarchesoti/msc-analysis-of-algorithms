@@ -145,7 +145,7 @@ ppair box_closest(const vector<point> &Y_, ppair closest){
 
 	for(auto p = Y_.cbegin(); p != Y_.cend(); ++p)
 
-		for(unsigned i = 1; i < inliers; ++i){
+		for(unsigned i = 1; i < inliers && (p+i) < Y_.cend(); ++i){
 
 			auto d = dist(*p, *(p+i));
 
