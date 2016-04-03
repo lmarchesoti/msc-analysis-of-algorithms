@@ -12,4 +12,4 @@
 
 *brute-force*
 
-*divide and conquer(todo)*
+*divide and conquer*
