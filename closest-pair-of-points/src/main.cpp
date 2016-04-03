@@ -8,7 +8,6 @@
 using namespace std;
 
 constexpr double max_inf{numeric_limits<double>::max()};
-
 constexpr unsigned inliers = 5;
 
 typedef struct { double x, y; } point;
@@ -24,6 +23,8 @@ ppair dc_closest_pair(const vector<point>&);
 ppair dc_closest_recursion(const vector<point>&, const vector<point>&);
 
 ppair box_closest(const vector<point>&, ppair);
+
+ppair check_coincident(const vector<point>&);
 
 int main(){
 
@@ -69,17 +70,24 @@ ppair brute_closest_pair(const vector<point> &points){
 
 ppair dc_closest_pair(const vector<point> &points){
 
+  // implement using sort(quicksort)
+  // check if we REALLY need to implement our mergesort
+  // use <algorithm> merge (or inplace_merge) if so
+
   vector<point> X{points}, Y{points};
 
 	// order points absolutely by x-coordinate
 	// and relatively by y-coordinate
-  sort(X.begin(), X.end(),
-    [](const point &p, const point &q)
-			{ return (p.x < q.x) ? true : (p.x == q.x) ? p.y < q.y : false; });
+  sort(X.begin(), X.end(), [](const point &p, const point &q)
+		{ return (p.x < q.x) ? true : (p.x == q.x) ? p.y < q.y : false; });
 
 	// order points by y-coordinate only
-  sort(Y.begin(), Y.end(),
-    [](const point &p, const point &q) { return p.y < q.y; });
+  sort(Y.begin(), Y.end(), [](const point &p, const point &q)
+		{ return p.y < q.y; });
+
+	// pre-process for coincident points
+	auto coincident = check_coincident(X);
+	if(coincident.dist == 0) return coincident;
 
 	return dc_closest_recursion(X, Y);
 }
@@ -88,17 +96,13 @@ ppair dc_closest_pair(const vector<point> &points){
 // on its left-side, right-side, or in-between
 ppair dc_closest_recursion(const vector<point> &X, const vector<point> &Y){
 
-  // implement using sort(quicksort)
-  // check if we REALLY need to implement our mergesort
-  // use <algorithm> merge (or inplace_merge) if so
-
   if(X.size() <= 3) return brute_closest_pair(X);
 
 	vector<point> Xl, Xr, Yl, Yr;
 
 	/* DIVIDE */
 	// find partition pivot
-	auto mid = X.size() / 2;// + 0.5;
+	auto mid = X.size() / 2;
 	auto pivot = X.at(mid);
 
 	// partition X
@@ -106,15 +110,11 @@ ppair dc_closest_recursion(const vector<point> &X, const vector<point> &Y){
 	copy(X.begin() + mid, X.end(), back_inserter(Xr));
 
 	// partition Y
-	for(const auto &i : Y){
+	copy_if(Y.begin(), Y.end(), back_inserter(Yl), [pivot](const point &p)
+			{ return p.x < pivot.x || (p.x == pivot.x && p.y < pivot.y); });
 
-		if(i.x < pivot.x) Yl.push_back(i);
-		if(i.x > pivot.x) Yr.push_back(i);
-		if(i.x == pivot.x) // covertical points
-			if(i.y < pivot.y) Yl.push_back(i);
-			else Yr.push_back(i); // i.y > pivot.y
-			// i.y == pivot.y is the coincident-points case
-	}
+	copy_if(Y.begin(), Y.end(), back_inserter(Yr), [pivot](const point &p)
+			{ return p.x > pivot.x || (p.x == pivot.x && p.y > pivot.y); });
 
 	/* CONQUER */
 	auto left  = dc_closest_recursion(Xl, Yl);
@@ -124,18 +124,12 @@ ppair dc_closest_recursion(const vector<point> &X, const vector<point> &Y){
 	/* COMBINE */
 	vector<point> Y_;
 
-	// figure which side gave the closest pair of points
-	//auto sigma  = left.dist < right.dist ? left.dist : right.dist;
-	auto sigma = closest.dist;
-
 	// create a vector within the 2sigma distance around the pivot
-	copy_if(Y.begin(), Y.end(), back_inserter(Y_),
-		[pivot, sigma](const point &p)
-			{ return (p.x >= (pivot.x - sigma) || p.x <= (pivot.x + sigma)); });
+	copy_if(Y.begin(), Y.end(), back_inserter(Y_), [pivot, closest](const point &p)
+			{ return abs(p.x - pivot.x) < closest.dist; });
 
 	// check if there is a closest pair of points that crosses the strip
 	auto cross = box_closest(Y_, closest);
-
 	closest = closest.dist <= cross.dist ? closest : cross;
 
   return closest;
@@ -145,7 +139,7 @@ ppair box_closest(const vector<point> &Y_, ppair closest){
 
 	for(auto p = Y_.cbegin(); p != Y_.cend(); ++p)
 
-		for(unsigned i = 1; i < inliers && (p+i) < Y_.cend(); ++i){
+		for(unsigned i = 1; i <= inliers && (p+i) < Y_.cend(); ++i){
 
 			auto d = dist(*p, *(p+i));
 
@@ -155,4 +149,12 @@ ppair box_closest(const vector<point> &Y_, ppair closest){
 		}
 
 	return closest;
+}
+
+ppair check_coincident(const vector<point> &points){
+
+	for(auto b = points.begin(), n = b + 1; n != points.end(); ++b, ++n)
+		if(b->x == n->x && b->y == n->y) return {{*b, *n}, 0};
+
+	return {{{0, 0}, {0, 0}}, -1};
 }
