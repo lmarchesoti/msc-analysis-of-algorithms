@@ -9,15 +9,15 @@ using matrix = vector<vector<int>>;
 constexpr int max_inf{numeric_limits<int>::max()};
 
 /* function prototypes */
-matrix floyd_warshall(matrix&);
+matrix floyd_warshall(const matrix&);
 
 // I/O processing
 matrix read_weight_matrix(unsigned);
-void display_matrix(matrix&);
+void display_matrix(const matrix&);
 matrix init_path_matrix(unsigned);
 
 // aux
-int decode(string&);
+int decode(const string&);
 string encode(int);
 
 /* debug */
@@ -38,7 +38,7 @@ int main(){
 }
 
 /* functions */
-matrix floyd_warshall(matrix &W){
+matrix floyd_warshall(const matrix &W){
 
 	auto D(W);
 
@@ -67,7 +67,7 @@ matrix read_weight_matrix(unsigned n){
 		return W;
 }
 
-void display_matrix(matrix &M){
+void display_matrix(const matrix &M){
 
 	for(const auto &v : M){
 		for(const auto &i : v)
@@ -93,5 +93,5 @@ string encode(int i)
 { return (i >= max_inf/4) ? "*" : to_string(i); }
 
 inline
-int decode(string &s)
+int decode(const string &s)
 { return (s[0] == '*') ? max_inf/2 : stoi(s, nullptr); }
