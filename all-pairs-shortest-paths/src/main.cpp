@@ -4,14 +4,17 @@
 
 using namespace std;
 
-constexpr int min_inf{numeric_limits<int>::min()};
+using matrix = vector<vector<int>>;
+
+constexpr int max_inf{numeric_limits<int>::max()};
 
 /* function prototypes */
-vector<vector<int>> floyd_warshall(vector<vector<int>>&);
+matrix floyd_warshall(matrix&);
 
 // I/O processing
-vector<vector<int>> read_weight_matrix(unsigned);
-void display_matrix(vector<vector<int>>&);
+matrix read_weight_matrix(unsigned);
+void display_matrix(matrix&);
+matrix init_path_matrix(unsigned);
 
 // aux
 int decode(string&);
@@ -35,38 +38,22 @@ int main(){
 }
 
 /* functions */
-vector<vector<int>> floyd_warshall(vector<vector<int>> &W){
+matrix floyd_warshall(matrix &W){
 
-/*
-	int kcost;
+	auto D(W);
 
-	// fill in base cases
-	for(int i = 1; i < nodes; ++i)
-		for(int j = 1; j < nodes; ++j){
-			spaths[i][j] = weights[i][j];
-			paths[i][j] = j;
-		}
+	for(int k = 0; k < D.size(); ++k)
+		for(int i = 0; i < D.size(); ++i)
+			for(int j = 0; j < D.size(); ++j)
+				D[i][j] = min(D[i][j], D[i][k] + D[k][j]);
 
-	// fill shortest paths matrix
-	for(int k = 1; k < nodes; ++k)
-		for(int i = 1; i < nodes; ++i)
-			for(int j = 1; j < nodes; ++j){
-				// cost-only one-liner
-				//spaths[i][j] = min(spaths[i][j], spaths[i][k] + spaths[k][j]);
-				// cost + path
-				kcost = spaths[i][k] + spaths[k][j];
-				if(kcost < spaths[i][j]){
-					spaths[i][j] = kcost;
-					paths[i][j] = k;
-				}
-			}
-*/
+	return D;
 
 }
 
-vector<vector<int>> read_weight_matrix(unsigned n){
+matrix read_weight_matrix(unsigned n){
 
-		vector<vector<int>> W(n, vector<int>(n, 0));
+		matrix W(n, vector<int>(n, 0));
 
 		string s;
 
@@ -79,7 +66,7 @@ vector<vector<int>> read_weight_matrix(unsigned n){
 		return W;
 }
 
-void display_matrix(vector<vector<int>> &M){
+void display_matrix(matrix &M){
 
 		// print all costs
 		for(const auto &v : M){
@@ -110,10 +97,20 @@ void display_matrix(vector<vector<int>> &M){
 
 }
 
+matrix init_path_matrix(unsigned n){
+
+	matrix P(n, vector<int>(n, -1));
+
+	for(int i = 0; i < P.size(); ++i)
+		P[i][i] = i;
+
+	return P;
+}
+
 inline
 string encode(int i)
-{ return (i == min_inf) ? "*" : to_string(i); }
+{ return (i >= max_inf/4) ? "*" : to_string(i); }
 
 inline
 int decode(string &s)
-{ return (s[0] == '*') ? min_inf : stoi(s, nullptr); }
+{ return (s[0] == '*') ? max_inf/2 : stoi(s, nullptr); }
