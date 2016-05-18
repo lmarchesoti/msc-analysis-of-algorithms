@@ -59,6 +59,7 @@ matrix read_weight_matrix(unsigned n){
 
 		for(auto &v : W)
 			for(auto &i : v){
+
 				cin >> s;
 				i = decode(s);
 			}
@@ -68,32 +69,12 @@ matrix read_weight_matrix(unsigned n){
 
 void display_matrix(matrix &M){
 
-		// print all costs
-		for(const auto &v : M){
-			for(const auto &i : v)
-				cout << encode(i) << " ";
-			cout << endl;
-		}
+	for(const auto &v : M){
+		for(const auto &i : v)
+			cout << encode(i) << " ";
 
-/*
-		// print all shortest paths
-		cout << "shortest paths: " << endl;
-		for(int i = 1; i < nodes; ++i){
-			for(int j = 1; j < nodes; ++j){
-				if(i != j){
-					cout << i << " ";
-					int k = paths[i][j];
-				//	while(k != j){
-				//		cout << k << " ";
-				//		k = paths[k][j];
-				//	}
-					cout << j << endl;
-				}
-			}
-		}
-				
 		cout << endl;
-	*/
+	}
 
 }
 
