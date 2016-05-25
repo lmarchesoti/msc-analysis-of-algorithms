@@ -11,6 +11,9 @@ constexpr int max_inf{numeric_limits<int>::max()};
 /* function prototypes */
 matrix floyd_warshall(const matrix&);
 
+matrix recursive_all_pairs_shortest_paths(const matrix&);
+int apsp(const matrix&, unsigned, unsigned, unsigned);
+
 // I/O processing
 matrix read_weight_matrix(unsigned);
 void display_matrix(const matrix&);
@@ -31,6 +34,7 @@ int main(){
 	auto W = read_weight_matrix(nodes);
 
 	auto D = floyd_warshall(W);
+	//auto D = recursive_all_pairs_shortest_paths(W);
 
 	display_matrix(D);
 
@@ -49,6 +53,25 @@ matrix floyd_warshall(const matrix &W){
 
 	return D;
 
+}
+
+matrix recursive_all_pairs_shortest_paths(const matrix &W){
+
+	auto D(W);
+	unsigned k = D.size();
+
+	for(int i = 0; i < k; ++i)
+		for(int j = 0; j < k; ++j)
+			D[i][j] = apsp(W, i, j, k - 1);
+
+	return D;
+}
+
+int apsp(const matrix &W, unsigned i, unsigned j, unsigned k){
+
+	if(k == -1) return W[i][j];
+
+	return min(apsp(W, i, j, k - 1), apsp(W, i, k, k - 1) + apsp(W, k, j, k - 1));
 }
 
 matrix read_weight_matrix(unsigned n){
