@@ -1,32 +1,73 @@
 #include <iostream>
 #include <vector>
+#include <list>
 
 using namespace std;
 
-/* data structures */
+class edge {
+
+public:
+  unsigned e;
+  list<edge>::iterator r;
+  edge(unsigned d) : e(d), r(NULL) { }
+  edge() { }
+};
+
 class graph{
 public:
   graph(istream&);
-  void remove_edge(unsigned, unsigned);
+  list<edge>::iterator remove_edge(list<edge>::iterator);
   void remove_adjacency(unsigned);
-  unsigned size_v() { return 0; }
+  unsigned size_v() { return v; }
+  unsigned size_e() { return e; }
 
 private:
 
-  // TODO
-  /* decide which representation works best for removing adjacency */
-
+  unsigned v;
+  unsigned e;
+  vector<list<edge>> adj;
+  void add_edge(unsigned, unsigned);
 };
 
 graph::graph(istream &in){
 
-  // TODO
+  in >> v;
+  adj.resize(v);
+
+  unsigned u, v;
+  while(in >> u >> v)
+    add_edge(u, v);
 }
+
+void graph::add_edge(unsigned u, unsigned v){
+
+  adj[v].emplace_front(u);
+  adj[u].emplace_front(v);
+
+  adj[v].front().r = adj[u].begin();
+  adj[u].front().r = adj[v].begin();
+
+  ++e;
+}
+
+list<edge>::iterator graph::remove_edge(list<edge>::iterator it){
+
+  unsigned t(it->r->e);
+  --e;
+
+  adj[it->e].erase(it->r);
+  return adj[t].erase(it);
+}
+
+void graph::remove_adjacency(unsigned v)
+{ for(auto i = adj[v].begin(); i != adj[v].end(); i = remove_edge(i)); }
 
 /* global variables */
 
 /* function prototypes */
 vector<unsigned> vertex_cover_brute(graph&);
+
+vector<unsigned> vertex_cover_brute(graph&, vector<unsigned>&, unsigned);
 
 vector<unsigned> to_vector(unsigned, unsigned);
 
@@ -51,18 +92,30 @@ int main(){
 /* functions */
 vector<unsigned> vertex_cover_brute(graph &g){
 
-  unsigned opt = g.size_v();
+  //vector<unsigned> sample(g.size_v(), 0);
 
-  /* check if sample is a cover			   *
-   * if so, save it if it is less than the optimum *
-   * optional: early stop when first opt found	   */
-  for(unsigned sample = 0; sample <= g.size_v(); ++sample){
+  //return vertex_cover_brute(g, sample, 0);
+}
 
-    // TODO
+vector<unsigned> vertex_cover_brute(graph &g, vector<unsigned> &sample, unsigned k){
 
+/*
+  if(k == sample.size()){
+
+    // process sample
+
+    return opt;
   }
 
-  return to_vector(opt, g.size_v());
+  sample[k] = 0;
+  // rec
+
+  sample[k] = 1;
+  // rec
+
+*/
+  // FIXME
+  return sample; 
 }
 
 /* turns a number cover into a vector cover with up to vertex l */
