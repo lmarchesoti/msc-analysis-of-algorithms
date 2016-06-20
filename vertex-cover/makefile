@@ -17,5 +17,8 @@ run r:
 clean n:
 	rm -f $(TARGET) output/* $(TEST) src/functions.cpp
 
+generatec gc:
+	g++ generate_input.cpp -o generate
+
 .PHONY=all
 all a: clean compile run

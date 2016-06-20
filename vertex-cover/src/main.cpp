@@ -18,8 +18,8 @@ int main(){
 
   graph g(cin);
 
-  //auto c = vertex_cover_brute(g);
-  auto c = vertex_cover_approx(g);
+  auto c = vertex_cover_brute(g);
+  //auto c = vertex_cover_approx(g);
 
   for(unsigned i = 1; i <= c.limit; ++i)
     if(c.v[i]) cout << i << " ";
