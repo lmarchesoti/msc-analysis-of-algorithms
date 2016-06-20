@@ -1,73 +1,14 @@
 #include <iostream>
 #include <vector>
 #include <list>
+#include "graph.h"
 
 using namespace std;
 
-class edge {
-
-public:
-  unsigned e;
-  list<edge>::iterator r;
-  edge(unsigned d) : e(d), r(NULL) { }
-  edge() { }
-};
-
-class graph{
-public:
-  graph(istream&);
-  list<edge>::iterator remove_edge(list<edge>::iterator);
-  void remove_adjacency(unsigned);
-  unsigned size_v() { return v; }
-  unsigned size_e() { return e; }
-
-private:
-
-  unsigned v;
-  unsigned e;
-  vector<list<edge>> adj;
-  void add_edge(unsigned, unsigned);
-};
-
-graph::graph(istream &in){
-
-  in >> v;
-  adj.resize(v);
-
-  unsigned u, v;
-  while(in >> u >> v)
-    add_edge(u, v);
-}
-
-void graph::add_edge(unsigned u, unsigned v){
-
-  adj[v].emplace_front(u);
-  adj[u].emplace_front(v);
-
-  adj[v].front().r = adj[u].begin();
-  adj[u].front().r = adj[v].begin();
-
-  ++e;
-}
-
-list<edge>::iterator graph::remove_edge(list<edge>::iterator it){
-
-  unsigned t(it->r->e);
-  --e;
-
-  adj[it->e].erase(it->r);
-  return adj[t].erase(it);
-}
-
-void graph::remove_adjacency(unsigned v)
-{ for(auto i = adj[v].begin(); i != adj[v].end(); i = remove_edge(i)); }
-
-/* global variables */
-
 /* function prototypes */
-vector<unsigned> vertex_cover_brute(graph&);
+sample vertex_cover_brute(graph&);
 
-vector<unsigned> vertex_cover_brute(graph&, vector<unsigned>&, unsigned);
+void vertex_cover_brute(graph&, sample&, sample&, unsigned);
 
 vector<unsigned> to_vector(unsigned, unsigned);
 
@@ -79,43 +20,74 @@ int main(){
 
   graph g(cin);
 
-  //auto c = vertex_cover_brute(g);
-  auto c = vertex_cover_approx(g);
+  /*
+  // TEST BUILD REMOVE
+  g.print(cout);
+  cout << endl;
 
-  for(const auto &i : c)
-    cout << i << " ";
+  //g.remove_edge(3, 6);
+  //g.remove_edge(3, 6);
+  //g.remove_adjacency(3);
+  //g.remove_adjacency(3);
+
+  for(int i = 0; i < 7; ++i)
+    g.remove_adjacency(6-i);
+
+  g.print(cout);
+  cout << endl;
+  */
+
+  /*
+  // TEST REMOVE 5ADJ REMOVE 6ADJ
+  g.print(cout);
+  cout << endl;
+
+  g.remove_adjacency(5);
+  g.remove_adjacency(6);
+
+  g.print(cout);
+  cout << endl;
+  */
+
+  auto c = vertex_cover_brute(g);
+  //auto c = vertex_cover_approx(g);
+
+  for(unsigned i = 1; i <= c.limit; ++i)
+    if(c.v[i]) cout << i << " ";
   cout << endl;
   
   return 0;
 }
 
 /* functions */
-vector<unsigned> vertex_cover_brute(graph &g){
+sample vertex_cover_brute(graph &g){
 
-  //vector<unsigned> sample(g.size_v(), 0);
+  sample s(g.size_v());
+  sample opt(g.size_v());
+  opt.fill();
 
-  //return vertex_cover_brute(g, sample, 0);
+  vertex_cover_brute(g, s, opt, 0);
+
+  return s;
 }
 
-vector<unsigned> vertex_cover_brute(graph &g, vector<unsigned> &sample, unsigned k){
+void vertex_cover_brute(graph &g, sample &s, sample &opt, unsigned k){
 
-/*
-  if(k == sample.size()){
+  if(k == s.limit){
 
-    // process sample
+    if(s.size < opt.size && cover(s, g))
+      opt = s;
 
-    return opt;
+    return;
   }
 
-  sample[k] = 0;
-  // rec
+  s.v[k] = 0;
+  vertex_cover_brute(g, s, opt, k+1);
 
-  sample[k] = 1;
-  // rec
-
-*/
-  // FIXME
-  return sample; 
+  ++s.size;
+  s.v[k] = 1;
+  vertex_cover_brute(g, s, opt, k+1);
+  --s.size;
 }
 
 /* turns a number cover into a vector cover with up to vertex l */

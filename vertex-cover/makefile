@@ -4,7 +4,7 @@ TEST=test
 
 # targets with shortcuts
 compile c: src/main.cpp
-	g++ src/main.cpp -o $(TARGET) $(PARAMS)
+	g++ src/* -o $(TARGET) $(PARAMS)
 
 test t: src/test_main.cpp
 	sh lib/extract_functions.sh 
@@ -18,4 +18,4 @@ clean n:
 	rm -f $(TARGET) output/* $(TEST) src/functions.cpp
 
 .PHONY=all
-all a: clean compile test run
+all a: clean compile run
