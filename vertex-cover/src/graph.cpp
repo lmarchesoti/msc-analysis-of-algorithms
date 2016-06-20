@@ -1,5 +1,6 @@
 #include "graph.h"
 #include <utility>
+#include <sstream>
 
 graph::graph(std::istream &in){
 
@@ -8,8 +9,28 @@ graph::graph(std::istream &in){
 
   sz_e = 0;
 
+  input += std::to_string(sz_v) + " ";
+
   unsigned u, v;
-  while(in >> u >> v)
+  while(in >> u >> v){
+    add_edge(u, v);
+    input += std::to_string(u) + " " + std::to_string(v) + " ";
+  }
+}
+
+graph::graph(const graph &g){
+
+  std::istringstream is(g.input);
+
+  input = g.input;
+
+  is >> sz_v;
+  adj.resize(sz_v);
+
+  sz_e = 0;
+
+  unsigned u, v;
+  while(is >> u >> v)
     add_edge(u, v);
 }
 
@@ -38,8 +59,6 @@ void graph::remove_adjacency(unsigned v)
 
 bool cover(const sample &s, graph g){
 
-  // FIXME
-  // segfault
   for(unsigned i = 0; i < s.limit; ++i)
     if(s.v[i]) g.remove_adjacency(i);
 

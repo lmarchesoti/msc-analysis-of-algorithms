@@ -19,12 +19,14 @@ public:
   void print(std::ostream&) const;
   void print() const;
   std::pair<unsigned, unsigned> pick() const;
+  graph(const graph&);
 
 private:
   unsigned sz_v;
   unsigned sz_e;
   std::vector<std::list<edge>> adj;
   void add_edge(unsigned, unsigned);
+  std::string input;
 };
 
 bool cover(const sample&, graph);
