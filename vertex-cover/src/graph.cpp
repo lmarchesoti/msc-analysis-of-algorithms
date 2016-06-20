@@ -1,9 +1,12 @@
 #include "graph.h"
+#include <utility>
 
 graph::graph(std::istream &in){
 
-  in >> v;
-  adj.resize(v);
+  in >> sz_v;
+  adj.resize(sz_v);
+
+  sz_e = 0;
 
   unsigned u, v;
   while(in >> u >> v)
@@ -18,13 +21,13 @@ void graph::add_edge(unsigned u, unsigned v){
   adj[v].front().r = adj[u].begin();
   adj[u].front().r = adj[v].begin();
 
-  ++e;
+  ++sz_e;
 }
 
 std::list<edge>::iterator graph::remove_edge(std::list<edge>::iterator it){
 
   unsigned t(it->r->e);
-  --e;
+  --sz_e;
 
   adj[it->e].erase(it->r);
   return adj[t].erase(it);
@@ -62,4 +65,12 @@ void graph::print() const {
   for(unsigned u = 0; u < adj.size(); ++u)
     for(const auto &v : adj[u])
       std::cout << u+1 << " " << v.e+1 << std::endl;
+}
+
+std::pair<unsigned, unsigned> graph::pick() const {
+
+  unsigned u;
+  for(u = 0; u < sz_v && adj[u].size() == 0; ++u);
+
+  return {u, adj[u].front().e};
 }

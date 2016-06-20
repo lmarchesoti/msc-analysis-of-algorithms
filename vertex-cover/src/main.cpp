@@ -10,9 +10,9 @@ sample vertex_cover_brute(graph&);
 
 void vertex_cover_brute(graph&, sample&, sample&, unsigned);
 
-vector<unsigned> to_vector(unsigned, unsigned);
+//vector<unsigned> to_vector(unsigned, unsigned);
 
-vector<unsigned> vertex_cover_approx(graph&);
+sample vertex_cover_approx(graph&);
 
 /* debug */
 
@@ -49,8 +49,8 @@ int main(){
   cout << endl;
   */
 
-  auto c = vertex_cover_brute(g);
-  //auto c = vertex_cover_approx(g);
+  //auto c = vertex_cover_brute(g);
+  auto c = vertex_cover_approx(g);
 
   for(unsigned i = 1; i <= c.limit; ++i)
     if(c.v[i]) cout << i << " ";
@@ -91,6 +91,7 @@ void vertex_cover_brute(graph &g, sample &s, sample &opt, unsigned k){
 }
 
 /* turns a number cover into a vector cover with up to vertex l */
+/*
 vector<unsigned> to_vector(unsigned n, unsigned l){
 
   vector<unsigned> r;
@@ -99,12 +100,22 @@ vector<unsigned> to_vector(unsigned n, unsigned l){
 
   return r;
 }
+*/
 
-vector<unsigned> vertex_cover_approx(graph &g){
+sample vertex_cover_approx(graph &g){
 
-  vector<unsigned> c;
+  sample c(g.size_v());
 
-  // TODO
+  while(g.size_e()){
+
+    auto e = g.pick();
+
+    c.v[e.first] = 1;
+    c.v[e.second] = 1;
+
+    g.remove_adjacency(e.first);
+    g.remove_adjacency(e.second);
+  }
 
   return c;
 }
